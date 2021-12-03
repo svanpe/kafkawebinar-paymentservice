@@ -1,0 +1,255 @@
+openapi: 3.0.1
+info:
+  title: Swagger WebShop Payment API
+  description: 'This is a sample API for handling payments in a webshop.'
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+tags:
+- name: payment
+  description: this API allows to create a payment to receive, register the payments and retrieve status of a payment to receive.
+  externalDocs:
+    description: Find out more
+    url: http://swagger.io
+
+paths:
+  /payment:
+    post:
+      tags:
+      - payment
+      summary: Add a new payment to receive
+      operationId: addPayment
+      requestBody:
+        description: Payment object that needs to be added 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+        required: true
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+        405:
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
+  /payment/findByStatus:
+    get:
+      tags:
+      - payment
+      summary: Finds Payments by status
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findPaymentsByStatus
+      parameters:
+      - name: status
+        in: query
+        description: Status values that need to be considered for filter
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - placed
+            - payed
+            - canceled
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+        400:
+          description: Invalid status value
+          content: {}
+
+  /payment/{paymentId}:
+    get:
+      tags:
+      - payment
+      summary: Find payment by ID
+      description: Returns a single payment
+      operationId: getPaymentById
+      parameters:
+      - name: paymentId
+        in: path
+        description: ID of payment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Peaymentt not found
+          content: {}
+
+  /payment/{paymentId}/paymentLine:
+    post:
+      tags:
+      - paymentLine
+      summary: add a new payment line for an existing payment and update payment status when it is totally paid
+      operationId: addPaymentLine
+      parameters:
+        - name: paymentId
+          in: path
+          description: ID of payment to add a payment line
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: PaymentLine object that needs to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentLine'
+        required: true
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLine'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Payment not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}
+      
+components:
+  schemas:
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        creationDate:
+          type: string
+          format: date
+        order:
+          $ref: '#/components/schemas/Order'
+        status:
+          type: string
+          description: payment Status
+          enum:
+          - placed
+          - ongoing
+          - payed
+        paymentLineList:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentLine'
+
+    PaymentLine:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        amount:
+          type: number
+        communication:
+          type: string
+        creationDate:
+          type: string
+          format: date
+
+          
+    Order:
+      type: object
+      properties:
+  
+        id:
+          type: integer
+          format: int64
+        creationDate:
+          type: string
+          format: date
+        customer:
+          $ref: '#/components/schemas/Customer'
+        status:
+          type: string
+          description: Order Status
+          enum:
+          - placed
+          - payed
+          - shipped
+          - delivered
+        orderItems:
+          type: array
+          items: 
+              $ref: '#/components/schemas/OrderItem'
+
+
+    OrderItem:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          product:
+            $ref: '#/components/schemas/Product'
+          quantity:
+            type: integer
+            format: int32
+    
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+          
+    Customer:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          firstName:
+            type: string
+          lastName:
+            type: string
+          email:
+            type: string
+
+ 
+ 
