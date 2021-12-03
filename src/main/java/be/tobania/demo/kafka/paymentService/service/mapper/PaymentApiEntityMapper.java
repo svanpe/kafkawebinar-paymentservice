@@ -3,6 +3,7 @@ package be.tobania.demo.kafka.paymentService.service.mapper;
 import be.tobania.demo.kafka.paymentService.entities.*;
 import be.tobania.demo.kafka.paymentService.model.Customer;
 import be.tobania.demo.kafka.paymentService.model.Payment;
+import be.tobania.demo.kafka.paymentService.model.PaymentLine;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class PaymentApiEntityMapper {
 
 
     public static PaymentEntity mapOrder(Payment payment) {
+        PaymentEntity paymentEntity = new PaymentEntity();
 
         CustomerEntity customer = new CustomerEntity();
         final Customer apiCustomer = payment.getOrder().getCustomer();
@@ -38,23 +40,25 @@ public class PaymentApiEntityMapper {
         orderEntity.setStatus(payment.getOrder().getStatus().getValue());
         orderEntity.setOrderItems(orderItemList);
 
-        List<PaymentLineEntity> paymentLineEntities = payment.getPaymentLineList().stream().map(paymentLine -> {
+         List <PaymentLine> paymentLines =payment.getPaymentLineList();
 
-            PaymentLineEntity paymentLineEntity = new PaymentLineEntity();
+         if(paymentLines!=null) {
+             List<PaymentLineEntity> paymentLineEntities = paymentLines.stream().map(paymentLine -> {
 
-            paymentLineEntity.setAmount(paymentLine.getAmount());
-            paymentLineEntity.setCommunication(paymentLine.getCommunication());
-            paymentLineEntity.setCreationDate(paymentLine.getCreationDate());
+                 PaymentLineEntity paymentLineEntity = new PaymentLineEntity();
 
-            return paymentLineEntity;
-        }).collect(Collectors.toList());
+                 paymentLineEntity.setAmount(paymentLine.getAmount());
+                 paymentLineEntity.setCommunication(paymentLine.getCommunication());
+                 paymentLineEntity.setCreationDate(paymentLine.getCreationDate());
 
-        PaymentEntity paymentEntity = new PaymentEntity();
+                 return paymentLineEntity;
+             }).collect(Collectors.toList());
+             paymentEntity.setPaymentLineList(paymentLineEntities);
+         }
 
         paymentEntity.setCreationDate(payment.getCreationDate());
         paymentEntity.setOrder(orderEntity);
         paymentEntity.setStatus(payment.getStatus());
-        paymentEntity.setPaymentLineList(paymentLineEntities);
 
         return paymentEntity;
 

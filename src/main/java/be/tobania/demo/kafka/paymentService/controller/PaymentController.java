@@ -49,9 +49,10 @@ public class PaymentController {
             produces = {"application/json"},
             consumes = {"application/json"}
     )
-    public PaymentLine addPaymentLine(@ApiParam(value = "ID of payment to add a payment line", required = true) @PathVariable("paymentId") Long paymentId
+    public Payment addPaymentLine(@ApiParam(value = "ID of payment to add a payment line", required = true) @PathVariable("paymentId") Long paymentId
             , @ApiParam(value = "PaymentLine object that needs to be created", required = true) @Valid @RequestBody PaymentLine paymentLine) {
-        return null;
+        log.info("create");
+        return paymentService.createPaymentLine(paymentId, paymentLine);
     }
 
 
@@ -64,7 +65,8 @@ public class PaymentController {
             produces = {"application/json"}
     )
     public List<Payment> findPaymentsByStatus(@NotNull @ApiParam(value = "Status values that need to be considered for filter", required = true, allowableValues = "placed, payed, canceled") @Valid @RequestParam(value = "status", required = true) List<String> status) {
-        return null;
+
+        return paymentService.getPaymentsByStatus(status);
     }
 
 

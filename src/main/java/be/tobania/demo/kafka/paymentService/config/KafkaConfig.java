@@ -22,7 +22,7 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic OrderToppic() {
-        return TopicBuilder.name("orders")
+        return TopicBuilder.name("payments")
                 .partitions(1)
                 .replicas(1)
                 .compact()

@@ -48,7 +48,9 @@ public class PaymentEntityApiMapper {
     }
 
     public static Payment mapPayment(PaymentEntity paymentEntity) {
+        Payment payment = new Payment();
 
+        if(paymentEntity.getPaymentLineList()!=null && !paymentEntity.getPaymentLineList().isEmpty()){
         List<PaymentLine> paymentLines = paymentEntity.getPaymentLineList().stream().map(paymentLineEntity -> {
             PaymentLine paymentLine = new PaymentLine();
             paymentLine.setAmount(paymentLineEntity.getAmount());
@@ -58,13 +60,13 @@ public class PaymentEntityApiMapper {
             return paymentLine;
         }).collect(Collectors.toList());
 
+            payment.setPaymentLineList(paymentLines);
+        }
 
-        Payment payment = new Payment();
 
-        payment.setCreationDate(paymentEntity.getCreationDate());
+            payment.setCreationDate(paymentEntity.getCreationDate());
         payment.setOrder(mapOrder(paymentEntity.getOrder()));
         payment.setId(paymentEntity.getId());
-        payment.setPaymentLineList(paymentLines);
         payment.setStatus(paymentEntity.getStatus());
 
         return payment;
