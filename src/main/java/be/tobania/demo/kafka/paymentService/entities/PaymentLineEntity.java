@@ -24,7 +24,7 @@ public class PaymentLineEntity {
 
     private LocalDate creationDate;
 
-   // @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //private PaymentEntity paymentEntity;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private PaymentEntity paymentEntity;
 
 }

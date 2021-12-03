@@ -27,7 +27,7 @@ public class PaymentEntity {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy ="paymentEntity" ,cascade = CascadeType.ALL)
     private List<PaymentLineEntity> paymentLineList;
 
 }

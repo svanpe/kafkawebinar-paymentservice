@@ -79,7 +79,10 @@ public class PaymentService {
         paymentLineEntity.setCreationDate(paymentLine.getCreationDate());
 
         paymentEntity.getPaymentLineList().add(paymentLineEntity);
-        paymentEntity.getPaymentLineList().add(paymentLineEntity);
+
+        //TODo: where to update the status of the order
+
+        paymentEntity.setStatus(PaymentStatus.PAYED);
 
         PaymentEntity updatedPayment = paymentRepository.save(paymentEntity);
 
@@ -105,15 +108,17 @@ public class PaymentService {
 
         log.info("start publishing payment");
 
-        kafkaTemplate.send(ORDER_TOPIC, payment.getId().toString(), payment);
+        kafkaTemplate.send(PAYMENT_TOPIC, payment.getId().toString(), payment);
 
-        log.info("order published");
+        log.info("payment published");
 
     }
 
     @KafkaListener(topics = ORDER_TOPIC, groupId = "orderService")
     public void consume(Order order) throws IOException {
         log.info(String.format("#### -> Consumed new order with status-> %s", order.getStatus().name()));
+
+        //TOD: refactor this part of the code to make more readable
 
         if(OrderStatus.PLACED == order.getStatus()){
             log.info("generate a new payment");
