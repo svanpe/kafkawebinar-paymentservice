@@ -39,5 +39,5 @@ RUN mvn clean install
 EXPOSE 8081
 
 FROM adoptopenjdk/openjdk11
-COPY --from=build /app/target/order-service*.jar /order-service.jar
-ENTRYPOINT ["java", "-jar", "order-service.jar"]
+COPY --from=build /app/target/payment-service*.jar /payment-service.jar
+ENTRYPOINT ["java", "-jar", "payment-service.jar"]

@@ -3,7 +3,7 @@
 @Library('tbn')
 
 def config = [
-    projectName: "order-service",
+    projectName: "payment-service",
     doDeploy: true,
 ]
 
