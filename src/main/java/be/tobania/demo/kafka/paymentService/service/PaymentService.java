@@ -114,7 +114,7 @@ public class PaymentService {
 
     }
 
-    @KafkaListener(topics = ORDER_TOPIC, groupId = "orderService")
+    @KafkaListener(topics = ORDER_TOPIC, groupId = "payment-service")
     public void consume(Order order) throws IOException {
         log.info(String.format("#### -> Consumed new order with status-> %s", order.getStatus().name()));
 
