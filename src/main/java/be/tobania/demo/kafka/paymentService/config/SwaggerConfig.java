@@ -11,7 +11,6 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("payment-service")
                 .packagesToScan("be.tobania.demo.kafka.paymentService")
-                .pathsToMatch("/payment/***")
                 .build();
     }
 
