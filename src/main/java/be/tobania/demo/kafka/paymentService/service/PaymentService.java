@@ -21,10 +21,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -108,13 +111,24 @@ public class PaymentService {
 
         log.info("start publishing payment");
 
-        kafkaTemplate.send(PAYMENT_TOPIC, payment.getId().toString(), payment);
+        ListenableFuture<SendResult<String, Payment>> future = kafkaTemplate.send(PAYMENT_TOPIC, payment.getId().toString(), payment);
+
+        future.addCallback(new ListenableFutureCallback<SendResult<String, Payment>>() {
+            @Override
+            public void onSuccess(SendResult<String, Payment> result) {
+                log.info(String.format("Produced event to topic %s: key = %-10s", ORDER_TOPIC, payment.getId().toString()));
+            }
+            @Override
+            public void onFailure(Throwable ex) {
+                ex.printStackTrace();
+            }
+        });
 
         log.info("payment published");
 
     }
 
-    @KafkaListener(topics = ORDER_TOPIC, groupId = "payment-service")
+    @KafkaListener(topics = ORDER_TOPIC, groupId = "payment-service-consumer-id")
     public void consume(Order order) throws IOException {
         log.info(String.format("#### -> Consumed new order with status-> %s", order.getStatus().name()));
 
